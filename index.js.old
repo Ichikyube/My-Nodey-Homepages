@@ -1,0 +1,154 @@
+var http = require("http"),
+    fpath = require("path"),
+    fs = require("fs"),
+    url = require("url"),
+    extensions = {
+        ".html": "text/html",
+        ".css": "text/css",
+        ".js": "application/javascript",
+        ".png": "image/png",
+        ".gif": "image/gif",
+        ".jpg": "image/jpg",
+    },
+    querystring = require("query-string");
+
+http.createServer(function (req, res) {
+    var userName, json, path = url.parse(req.url, true, false).pathname.split("/"),
+        data = "";
+    var filename = fpath.basename(req.url) || "index.html",
+        ext = fpath.extname(filename),
+        dir = fpath.dirname(req.url).substring(1),
+        localPath = __dirname + "/public/";
+    //localPath = path.resolve(__dirname + "/public/" + filename);
+
+    if (req.method == "GET") {
+        if(path[1] == "sayHello")        userName = String(path[2]) + " " + String(path[3]);
+        if (extensions[ext] ? extensions[ext] : ".html") {
+            localPath += (dir ? dir + "/" : "") + filename;
+            fs.exists(localPath, function (exists) {
+                if (exists) {
+                    getFile(localPath, extensions[ext], res);
+                } else {
+                    res.writeHead(200, {
+                        //set the type of content and length we're returning
+                        "Content-Type": "text/html",
+                        "Content-Length": html.length
+                    });
+    
+                    res.end(html);
+                }
+            })
+        }
+    }
+    if (req.method == "POST") {
+        req.on("data", function (chunk) {
+            data += chunk;
+        });
+        req.on("end", function () {
+            var params = querystring.parse(data),
+                userName = params.firstName + ' ' + params.lastName; //if doesn't have a name then first and last name
+            if (params.callback) {
+                json = qs.callback + "({username:'" + userName + "'});";
+            } else {
+                json = JSON.stringify({
+                    "username": userName
+                });
+            }
+            console.log(json)
+            res.writeHead(200, {
+                "Content-Type": "application/json",
+                "Content-Length": json.length
+            });
+            res.end(json);
+        });
+
+    }
+    const {
+        firstName = "my", lastName = "friend"
+    } = querystring.parse(req.url.split("?")[1]);
+    userName = userName ?? firstName + ' ' + lastName; //if doesn't have a name then first and last name
+    var html = "<!DOCTYPE html>" +
+        "<html lang=\"en\"><head><title>Hello " + userName + "</title></head>" +
+        "<body>" + userName + ", you are in nowhere</div></body></html>";
+
+
+    function getFile(localPath, mimeType, res) {
+        fs.readFile(localPath, function (err, page) {
+            if (!err) {
+                res.writeHead(200, { //set the type of content and length we're returning
+                    "Content-Type": mimeType,
+                    "Content-Length": page.length
+                })
+                res.write(page);
+                res.end();
+            } else {
+                res.writeHead(500);
+                res.end();
+            }
+        });
+
+    }
+}).listen(8000, "127.0.0.1");
+
+
+/*
+var redis = require("redis"),
+    db = redis.createClient(6379, "127.0.0.1");
+db.get(firstName, function (err, lastName) {
+})
+
+connectRouter= require('connect-router'),
+    createStatic = require('connect-static'),
+    path = require("path"),
+    urlrouter = require('urlrouter'),
+    Router       = require('router'),
+    serveStatic = require('serve-static');
+var router = urlrouter(function (app) {
+    console.log("enter")
+    app.get('/', function (request, response) {
+        fs.readFile(path.join(__dirname, 'public/index.html'), function (err, page) {
+            if (!err) {
+                response.writeHead(200, {//set the type of content and length we're returning
+                    "Content-Type": 'text/html',
+                    "Content-Length": page.length
+                })
+                response.write(page);
+                response.end();
+            } else {
+                response.writeHead(500);
+                response.end();
+            }
+        });
+        response.writeHead(200, {
+            'Content-Type': 'text/plain'
+        });
+    });
+    app.get("/sayHello/:firstName/:lastName", function (req, res) {
+        var userName = req.params.firstName + " " + req.params.lastName,
+            html = "<html lang=\"en\"><head><title>Hello " + userName + "</title></head>" +
+            "<body>" + userName + ", you are in nowhere</div></body></html>";
+        res.end(html);
+    });
+});*/
+/* These are all defaults. If you leave any options out, this is what they
+// will be.
+var options = {
+  dir: "public",
+  aliases: [
+    ['/', '/index.html'],
+  ],
+  ignoreFile: function(fullPath) {
+    var basename = path.basename(fullPath);
+    return /^\./.test(basename) || /~$/.test(basename);
+  },
+  followSymlinks: true,
+  cacheControlHeader: "max-age=0, must-revalidate",
+};
+createStatic(options, function(err, middleware) {
+  if (err) throw err;
+  app.use('/', middleware);
+});
+```
+
+
+*/
