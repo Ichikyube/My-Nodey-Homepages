@@ -5,24 +5,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js" crossorigin="anonymous"
-        integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="></script>
+    <title>{{pageTitle}}</title>
     <script src="js/socket.io.js"></script>
 </head>
 
 <body>
     <div id="hello"></div>
-    <script defer>
-        (($) => $(document).ready(() => $('#hello').text('Hello,World')))(jQuery);
-    </script>
-    <h1>Edit your user information</h1>
+    <h1>Write your name!</h1>
     <form action="/" method="POST">
-        <label for="">First name :
-            <input id="txtFirstName" type="text" name="firstName" placeholder="First Name">
+        <label for="firstName">First name :
+            <input id="txtFirstName" type="text" name="firstName" placeholder="First Name" value="">
         </label>
-        <label for="">Last name :
-            <input id="txtLastName" type="text" name="firstName" placeholder="Last Name">
+        <label for="lastName">Last name :
+            <input id="txtLastName" type="text" name="lastName" placeholder="Last Name" value="">
         </label>
         <input id="btnGetName" type="submit" value="Save">
     </form>
@@ -37,16 +32,7 @@
                 firstName: fName.value,
                 lastName: lName.value
             });
-            return false;
-        });
-        socket.on('connection', (socket) => {
-            console.log('a user connected');
-            socket.on('disconnect', () => {
-                console.log('user disconnected');
-            });
-        });
-        socket.on("nameSet", function (data) {
-            alert("Username set: " + data.userName);
+            return false
         });
     </script>
 </body>
